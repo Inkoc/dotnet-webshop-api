@@ -1,3 +1,7 @@
 <Solution>
-  <Project Path="dotnet-webshop-api/dotnet-webshop-api.csproj" />
+  <Project Path="WebShop.Application/WebShop.Application.csproj" Id="ed11a577-52d1-46bc-bd08-25c51992f47b" />
+  <Project Path="WebShop.DAL/WebShop.DAL.csproj" Id="415711ce-2a6c-4e46-98bd-54c716849149" />
+  <Project Path="WebShop.Domain/WebShop.Domain.csproj" Id="9bf5e26f-c26a-4b1b-9c52-fb18a3732149" />
+  <Project Path="WebShop.Tests/WebShop.Tests.csproj" Id="4fc43f89-f6c0-4113-93f3-dfac09e07fd0" />
+  <Project Path="WebShop.Api/WebShop.Api.csproj" />
 </Solution>
