@@ -1,10 +1,17 @@
 using Microsoft.OpenApi;
+using Serilog;
 using WebShop.Api.Extensions;
 using WebShop.Api.Filters;
-using WebShop.DAL.Extensions;
 using WebShop.Application.Extensions;
+using WebShop.DAL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Serilog
+builder.Host.UseSerilog((context, config) =>
+    config.ReadFrom.Configuration(context.Configuration)
+          .WriteTo.Console()
+          .WriteTo.File("logs/webshop-.log", rollingInterval: RollingInterval.Day));
 
 builder.Services.AddDalServices(builder.Configuration.GetConnectionString("DefaultConnection")!);
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -41,6 +48,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
+
+app.UseExceptionHandling();
 
 if (app.Environment.IsDevelopment())
 {
