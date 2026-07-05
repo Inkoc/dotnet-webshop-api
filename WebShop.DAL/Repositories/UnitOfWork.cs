@@ -12,6 +12,7 @@ namespace WebShop.DAL.Repositories
         private readonly WebShopDbContext _context;
         private readonly Dictionary<Type, object> _repositories = new();
         private IUserRepository? _users;
+        private IProductRepository? _products;
         private bool _disposed;
 
         public UnitOfWork(WebShopDbContext context)
@@ -20,6 +21,8 @@ namespace WebShop.DAL.Repositories
         }
 
         public IUserRepository Users => _users ??= new UserRepository(_context);
+
+        public IProductRepository Products => _products ??= new ProductRepository(_context);
 
         public void Dispose()
         {

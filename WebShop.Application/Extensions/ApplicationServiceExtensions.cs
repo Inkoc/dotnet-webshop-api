@@ -23,6 +23,7 @@ namespace WebShop.Application.Extensions
             services.AddScoped<ITokenService, TokenService>();
 
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IProductService, ProductService>();
 
             services.AddValidatorsFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
 
