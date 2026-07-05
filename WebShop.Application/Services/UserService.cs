@@ -37,6 +37,12 @@ public class UserService : IUserService
             return false;
         }
 
+        var orders = await _unitOfWork.Orders.GetByUserAsync(id, cancellationToken);
+        if (orders.Any())
+        {
+            throw new ConflictException("Cannot delete a user who has orders.");
+        }
+
         _unitOfWork.Users.Delete(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
