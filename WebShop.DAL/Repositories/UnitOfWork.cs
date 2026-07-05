@@ -15,6 +15,7 @@ namespace WebShop.DAL.Repositories
         private IProductRepository? _products;
         private IReviewRepository? _reviews;
         private ICartRepository? _carts;
+        private IOrderRepository? _orders;
         private bool _disposed;
 
         public UnitOfWork(WebShopDbContext context)
@@ -29,6 +30,8 @@ namespace WebShop.DAL.Repositories
         public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_context);
 
         public ICartRepository Carts => _carts ??= new CartRepository(_context);
+
+        public IOrderRepository Orders => _orders ??= new OrderRepository(_context);
 
         public void Dispose()
         {

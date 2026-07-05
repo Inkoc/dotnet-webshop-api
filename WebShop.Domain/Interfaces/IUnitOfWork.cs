@@ -11,6 +11,7 @@ namespace WebShop.Domain.Interfaces
         IProductRepository Products { get; }
         IReviewRepository Reviews { get; }
         ICartRepository Carts { get; }
+        IOrderRepository Orders { get; }
         IRepository<T> Repository<T>() where T : BaseEntity;
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

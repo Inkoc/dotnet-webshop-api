@@ -4,6 +4,7 @@ using System.Text;
 using WebShop.Application.DTOs.Auth;
 using WebShop.Application.DTOs.Cart;
 using WebShop.Application.DTOs.Category;
+using WebShop.Application.DTOs.Order;
 using WebShop.Application.DTOs.Product;
 using WebShop.Application.DTOs.Review;
 using WebShop.Domain.Entities;
@@ -85,6 +86,28 @@ namespace WebShop.Application.Mapping
 
             var total = items.Sum(i => i.LineTotal);
             return new CartDto(cart.Id, items, total);
+        }
+
+        public static OrderItemDto ToDto(this OrderItem item)
+        {
+            return new OrderItemDto(
+                item.ProductId,
+                item.Product?.Name ?? string.Empty,
+                item.UnitPrice,
+                item.Quantity,
+                item.UnitPrice * item.Quantity);
+        }
+
+        public static OrderDto ToDto(this Order order)
+        {
+            var items = order.OrderItems.Select(oi => oi.ToDto()).ToList();
+            return new OrderDto(
+                order.Id,
+                order.UserId,
+                order.CreatedAt,
+                order.Status.ToString(),
+                order.TotalAmount,
+                items);
         }
     }
 }
