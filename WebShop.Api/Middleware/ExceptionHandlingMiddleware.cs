@@ -36,6 +36,8 @@ namespace WebShop.Api.Middleware
                 AuthenticationException => (HttpStatusCode.Unauthorized, exception.Message),
                 InvalidRefreshTokenException => (HttpStatusCode.Unauthorized, exception.Message),
                 NotFoundException => (HttpStatusCode.NotFound, exception.Message),
+                ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
+                ConflictException => (HttpStatusCode.Conflict, exception.Message),
                 ArgumentException => (HttpStatusCode.BadRequest, exception.Message),
                 _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
             };

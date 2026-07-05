@@ -4,6 +4,7 @@ using System.Text;
 using WebShop.Application.DTOs.Auth;
 using WebShop.Application.DTOs.Category;
 using WebShop.Application.DTOs.Product;
+using WebShop.Application.DTOs.Review;
 using WebShop.Domain.Entities;
 
 namespace WebShop.Application.Mapping
@@ -48,6 +49,27 @@ namespace WebShop.Application.Mapping
                 Price = dto.Price,
                 StockQuantity = dto.StockQuantity,
                 CategoryId = dto.CategoryId
+            };
+        }
+
+        public static ReviewDto ToDto(this Review review)
+        {
+            return new ReviewDto(
+                review.Id,
+                review.ProductId,
+                review.UserId,
+                review.Rating,
+                review.Comment,
+                review.CreatedAt);
+        }
+
+        public static Review ToEntity(this CreateReviewDto dto)
+        {
+            return new Review
+            {
+                ProductId = dto.ProductId,
+                Rating = dto.Rating,
+                Comment = dto.Comment
             };
         }
     }
