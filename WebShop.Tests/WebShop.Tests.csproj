@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WebShop.Api\WebShop.Api.csproj" />
     <ProjectReference Include="..\WebShop.Application\WebShop.Application.csproj" />
   </ItemGroup>
