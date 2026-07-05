@@ -19,6 +19,16 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>());
 
+//CORS for the React client
+const string ClientCorsPolicy = "WebShopClient";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(ClientCorsPolicy, policy =>
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 //Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -61,6 +71,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(ClientCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
