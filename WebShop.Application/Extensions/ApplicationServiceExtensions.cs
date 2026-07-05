@@ -27,6 +27,7 @@ namespace WebShop.Application.Extensions
             services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddValidatorsFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
 
