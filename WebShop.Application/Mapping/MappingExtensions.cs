@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using WebShop.Application.DTOs.Auth;
+using WebShop.Application.DTOs.Cart;
 using WebShop.Application.DTOs.Category;
 using WebShop.Application.DTOs.Product;
 using WebShop.Application.DTOs.Review;
@@ -71,6 +72,19 @@ namespace WebShop.Application.Mapping
                 Rating = dto.Rating,
                 Comment = dto.Comment
             };
+        }
+
+        public static CartDto ToDto(this Cart cart)
+        {
+            var items = cart.CartItems.Select(ci => new CartItemDto(
+                ci.ProductId,
+                ci.Product?.Name ?? string.Empty,
+                ci.Product?.Price ?? 0m,
+                ci.Quantity,
+                (ci.Product?.Price ?? 0m) * ci.Quantity)).ToList();
+
+            var total = items.Sum(i => i.LineTotal);
+            return new CartDto(cart.Id, items, total);
         }
     }
 }
