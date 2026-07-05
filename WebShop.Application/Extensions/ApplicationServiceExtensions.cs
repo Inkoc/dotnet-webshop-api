@@ -22,6 +22,8 @@ namespace WebShop.Application.Extensions
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<ITokenService, TokenService>();
 
+            services.AddScoped<ICategoryService, CategoryService>();
+
             services.AddValidatorsFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
 
             return services;
