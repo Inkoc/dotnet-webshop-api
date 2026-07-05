@@ -17,6 +17,7 @@ namespace WebShop.Application.Extensions
             IConfiguration configuration)
         {
             services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+            services.Configure<AdminSeedOptions>(configuration.GetSection(AdminSeedOptions.SectionName));
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -28,6 +29,8 @@ namespace WebShop.Application.Extensions
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IDbSeeder, DbSeeder>();
 
             services.AddValidatorsFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
 

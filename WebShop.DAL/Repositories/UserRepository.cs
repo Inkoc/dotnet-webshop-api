@@ -49,5 +49,11 @@ namespace WebShop.DAL.Repositories
                 .ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken, cancellationToken);
         }
+
+        public async Task<bool> AnyInRoleAsync(string roleName, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet
+                .AnyAsync(u => u.UserRoles.Any(ur => ur.Role.Name == roleName), cancellationToken);
+        }
     }
 }

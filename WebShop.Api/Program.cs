@@ -3,6 +3,7 @@ using Serilog;
 using WebShop.Api.Extensions;
 using WebShop.Api.Filters;
 using WebShop.Application.Extensions;
+using WebShop.Application.Interfaces;
 using WebShop.DAL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +60,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();
+    await seeder.SeedAsync();
+}
 
 app.UseSerilogRequestLogging();
 
