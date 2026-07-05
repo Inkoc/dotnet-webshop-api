@@ -1,30 +1,25 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Build context is the repo root (see docker-compose.yml).
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
+COPY ["WebShop.Api/WebShop.Api.csproj", "WebShop.Api/"]
+COPY ["WebShop.Application/WebShop.Application.csproj", "WebShop.Application/"]
+COPY ["WebShop.DAL/WebShop.DAL.csproj", "WebShop.DAL/"]
+COPY ["WebShop.Domain/WebShop.Domain.csproj", "WebShop.Domain/"]
+RUN dotnet restore "WebShop.Api/WebShop.Api.csproj"
+
+COPY WebShop.Api/ WebShop.Api/
+COPY WebShop.Application/ WebShop.Application/
+COPY WebShop.DAL/ WebShop.DAL/
+COPY WebShop.Domain/ WebShop.Domain/
+RUN dotnet publish "WebShop.Api/WebShop.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["dotnet-webshop-api/dotnet-webshop-api.csproj", "dotnet-webshop-api/"]
-RUN dotnet restore "./dotnet-webshop-api/dotnet-webshop-api.csproj"
-COPY . .
-WORKDIR "/src/dotnet-webshop-api"
-RUN dotnet build "./dotnet-webshop-api.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./dotnet-webshop-api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "dotnet-webshop-api.dll"]
+ENV ASPNETCORE_HTTP_PORTS=8080
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "WebShop.Api.dll"]

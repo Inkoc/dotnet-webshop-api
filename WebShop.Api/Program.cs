@@ -1,9 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Serilog;
 using WebShop.Api.Extensions;
 using WebShop.Api.Filters;
 using WebShop.Application.Extensions;
 using WebShop.Application.Interfaces;
+using WebShop.DAL.Data;
 using WebShop.DAL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,6 +65,9 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<WebShopDbContext>();
+    await db.Database.MigrateAsync();
+
     var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();
     await seeder.SeedAsync();
 }
@@ -71,13 +76,13 @@ app.UseSerilogRequestLogging();
 
 app.UseExceptionHandling();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseCors(ClientCorsPolicy);
 
