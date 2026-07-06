@@ -14,12 +14,11 @@ COPY WebShop.DAL/ WebShop.DAL/
 COPY WebShop.Domain/ WebShop.Domain/
 RUN dotnet publish "WebShop.Api/WebShop.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
-    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /app/publish/logs
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra AS final
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
-COPY --from=build /app/publish .
+COPY --from=build --chown=1654:1654 /app/publish .
 ENTRYPOINT ["dotnet", "WebShop.Api.dll"]
