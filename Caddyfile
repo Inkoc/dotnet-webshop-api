@@ -1,0 +1,21 @@
+{$DOMAIN:localhost} {
+	encode gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	handle /api/* {
+		reverse_proxy webshop-api:8080
+	}
+
+	handle /swagger* {
+		reverse_proxy webshop-api:8080
+	}
+
+	handle {
+		reverse_proxy webshop-frontend:80
+	}
+}
