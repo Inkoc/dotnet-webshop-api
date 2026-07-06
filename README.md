@@ -1,5 +1,7 @@
 # WebShop — E-commerce API & Client
 
+**Live demo: [webshop-demo.inkoc.com](https://webshop-demo.inkoc.com/)**
+
 Full-stack e-commerce application: an **ASP.NET Core (.NET 10) Web API** with a
 **React** client. Built with a layered/clean architecture, EF Core (Code First) on
 PostgreSQL, JWT authentication, and a one-command Docker deployment.
@@ -23,6 +25,8 @@ PostgreSQL, JWT authentication, and a one-command Docker deployment.
 
 **Infrastructure**
 - Docker + Docker Compose (PostgreSQL + API + nginx-served frontend)
+- Caddy reverse proxy — single public entry point with automatic HTTPS (Let's Encrypt in production, local CA in dev)
+- API runs on a distroless (chiseled) .NET image as a non-root user
 
 ---
 
@@ -53,7 +57,7 @@ and multiple **1:N** (Category → Products, User → Orders, Order → OrderIte
 - **Cart** — per-user cart, add/update/remove items with stock checks.
 - **Orders** — checkout snapshots prices, decrements stock and clears the cart in one transaction; users see their orders, admins see all and update status.
 - **Users admin** — list, view, role assignment, delete.
-- **Cross-cutting** — global exception handling with standardized `{ error, statusCode }` responses, request/error logging (Serilog), Swagger with JWT "Authorize", validation via FluentValidation.
+- **Cross-cutting** — global exception handling with standardized `{ error, statusCode }` responses, request/error logging (Serilog), Swagger with JWT "Authorize", validation via FluentValidation, per-IP rate limiting on auth endpoints.
 
 ---
 
@@ -68,19 +72,30 @@ cp .env.example .env      # then edit .env (see below)
 docker compose up --build
 ```
 
-- Frontend: **http://localhost:3000**
-- API + Swagger: **http://localhost:8080/swagger**
-- On first start the API **applies migrations and seeds an admin** automatically.
+Everything is served through the Caddy reverse proxy:
+
+- Frontend: **https://localhost**
+- API + Swagger: **https://localhost/swagger**
+
+Locally Caddy issues a self-signed certificate — accept the browser warning once.
+On first start the API **applies migrations and seeds an admin** automatically.
+To also load the demo catalog (~600 products, run once):
+
+```bash
+docker compose exec -T postgres-db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < seed.sql
+```
 
 `.env` values:
 
 | Variable | Purpose |
 |---|---|
+| `DOMAIN` | Public domain Caddy serves (`localhost` for local runs) |
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | Postgres container credentials |
 | `JWT_SECRET_KEY` | JWT signing key (**≥ 32 characters**) |
 | `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD` | Admin account seeded on a fresh DB |
 
-Stop with `docker compose down` (add `-v` to also wipe the database volume).
+Stop with `docker compose down` (add `-v` to also wipe the database volume and
+Caddy's certificates).
 
 ### Option B — Local development
 
@@ -104,7 +119,23 @@ cd frontend
 npm install
 npm run dev            # http://localhost:5173
 ```
-The client reads `VITE_API_BASE_URL` (defaults to `https://localhost:7151`).
+The client reads `VITE_API_BASE_URL` (defaults to `https://localhost:7151`; the
+Docker build sets it empty so API calls stay same-origin behind Caddy).
+
+### Option C — Deploy to a server
+
+The same compose file runs the [live demo](https://webshop-demo.inkoc.com/).
+On a VPS with Docker installed:
+
+1. Point an A record for your (sub)domain at the server and open ports 80/443.
+2. Clone the repo and create `.env` with production values: a strong
+   `POSTGRES_PASSWORD`, a random `JWT_SECRET_KEY` (`openssl rand -base64 48`),
+   a strong `ADMIN_SEED_PASSWORD`, and `DOMAIN=your.domain.com`.
+3. `docker compose up -d --build`
+
+Caddy obtains and renews the Let's Encrypt certificate automatically and is the
+only container with published ports — the API and Postgres are reachable only on
+the internal Docker network.
 
 ---
 

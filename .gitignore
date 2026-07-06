@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Docker compose env (.env.example is committed)
 .env
+
+# Ignore JetBrains Rider project files
+.idea/
